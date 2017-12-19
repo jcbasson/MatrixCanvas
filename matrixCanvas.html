@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Matrix</title>
+    <style>
+        * {margin: 0; padding: 0;}
+        canvas {display: block;background: black;}
+    </style>
+</head>
+<body>
+<canvas id="matrixCanvas"></canvas>
+<script>
+    const generateRowOfCells = (columns) =>
+    {
+        const cells = [];
+        for(var x = 0; x < columns; x++) cells[x] = 1;
+        return cells;
+    };
+
+    const drawText = (ctx,font_size, characters, indexOfCell, cell) =>
+    {
+        const character = characters[Math.floor(Math.random()*characters.length)];
+        const coordinateX = indexOfCell*font_size;
+        const coordinateY = cell*font_size;
+        ctx.fillText(character, coordinateX, coordinateY);
+    };
+    
+    const drawRow = (cells, drawText, checkIfColumnUsedUp, randomConditionGenerator) =>
+    {
+        for(var i = 0; i < cells.length; i++) {
+            let cell = cells[i];
+            if (checkIfColumnUsedUp(cells[i]) && randomConditionGenerator()) cell = 1;
+            drawText(i, cell);
+            cell++;
+            cells[i] = cell;
+        }
+    };
+
+    const checkIfColumnUsedUp = (fontSize, columnHeight, cell) => {
+        return cell*fontSize > columnHeight;
+    };
+
+    const randomConditionGenerator = () =>
+    {
+        return Math.random() > 0.85;
+    }
+
+    const drawMatrix = (canvas, ctx, fontSize, drawRow) =>
+    {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#0F0";
+        ctx.font =  `${fontSize}px aria`;
+
+        drawRow();
+    };
+
+    function initializeMatrixCanvas(generateRowOfCells, drawText, drawRow, checkIfColumnUsedUp, randomConditionGenerator, drawMatrix)
+    {
+        const canvas= document.getElementById("matrixCanvas");
+        canvas.height = window.innerHeight;
+        canvas.width = window.innerWidth;
+        const ctx = canvas.getContext("2d");
+        const characters = ["0", "1"];
+        const fontSize = 14;
+        const columns = canvas.width/fontSize;
+        const cells = generateRowOfCells(columns);
+        setInterval(drawMatrix.bind(null, canvas, ctx, fontSize, drawRow.bind(null, cells, drawText.bind(null,ctx, fontSize, characters), checkIfColumnUsedUp.bind(null, fontSize, canvas.height), randomConditionGenerator)), 50);
+    }
+
+    window.onload = initializeMatrixCanvas.bind(null, generateRowOfCells, drawText,drawRow,checkIfColumnUsedUp, randomConditionGenerator,  drawMatrix);
+</script>
+</body>
+</html>
